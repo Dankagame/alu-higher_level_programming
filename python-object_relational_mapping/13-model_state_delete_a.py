@@ -20,12 +20,19 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    # Delete states containing 'a', case insensitive
-    states_to_delete = session.query(State).filter(
-        State.name.ilike('%a%')
-    ).all()
-    for state in states_to_delete:
-        session.delete(state)
-    session.commit()
+    try:
+        # Delete states containing 'a', case insensitive
+        states_to_delete = session.query(State).filter(
+            State.name.ilike('%a%')
+        ).all()
 
-    session.close()
+        for state in states_to_delete:
+            session.delete(state)
+
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred: {e}")
+    finally:
+        session.close()
+
